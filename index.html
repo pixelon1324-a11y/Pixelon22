@@ -176,3 +176,4 @@ function rs(){W=c.width=innerWidth;H=c.height=innerHeight;P=[];var n=Math.min(60
 function dr(){x.clearRect(0,0,W,H);for(var i=0;i<P.length;i++){var p=P[i];if(!reduce){p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1}x.fillStyle="#1ea7ff";x.fillRect(p.x,p.y,2,2);for(var j=i+1;j<P.length;j++){var q=P[j],d=Math.hypot(p.x-q.x,p.y-q.y);if(d<140){x.strokeStyle="rgba(30,167,255,"+(1-d/140)*.35+")";x.beginPath();x.moveTo(p.x,p.y);x.lineTo(q.x,q.y);x.stroke()}}}if(!reduce)requestAnimationFrame(dr)}
 addEventListener("resize",function(){rs();if(reduce)dr()});rs();dr();
 </script></body></html>
+<script src="account.js"></script>
