@@ -531,33 +531,48 @@
     handleSession(session);
   });
 
-  cb.onclick = function () {
-    if (!uid) return;
+cb.onclick = async function () {
+  if (!uid) {
+    var result = await sb.auth.getSession();
+    var session = result.data && result.data.session;
 
-    panel.hidden = false;
+    if (!session || !session.user) {
+      panel.hidden = true;
+      return;
+    }
 
-    sb.from("profiles")
+    uid = session.user.id;
+  }
+
+  // Otvorenie profilu hneď po kliknutí
+  panel.hidden = false;
+  panel.textContent = "Načítavam profil…";
+
+  isAdmin = false;
+
+  try {
+    var result = await sb
+      .from("profiles")
       .select("role")
       .eq("id", uid)
-      .maybeSingle()
-      .then(function (result) {
-        isAdmin = !!(
-          result.data &&
-          result.data.role === "admin"
-        );
+      .maybeSingle();
 
-        render();
-      })
-      .catch(function (error) {
-        console.error(error);
-        isAdmin = false;
-        render();
-      });
-  };
+    if (!result.error) {
+      isAdmin = !!(
+        result.data &&
+        result.data.role === "admin"
+      );
+    }
+  } catch (error) {
+    console.error("PIXELON profile error:", error);
+  }
+
+  render();
+};
 
   document.querySelectorAll(".lang button").forEach(function (button) {
     button.addEventListener("click", function () {
       if (!panel.hidden && uid) render();
     });
   });
-})();
+})
