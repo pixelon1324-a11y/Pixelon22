@@ -1,26 +1,27 @@
 <!DOCTYPE html>
-<html lang="sk"><head>
+<html lang="sk">
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>PIXELON – Edit. Create. Dominate.</title>
 <style>
-:root{--bg:#04070f;--panel:#0a1224;--line:#15305c;--text:#e6efff;--mute:#8aa0c4;--neon:#1ea7ff;--glow:rgba(30,167,255,.45);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root{--bg:#04070f;--panel:#0a1224;--line:#15305c;--text:#e6efff;--mute:#8aa0c4;--neon:#1ea7ff;--glow:rgba(30,167,255,.45);box-sizing:border-box}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:70px}
-body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 "Segoe UI",system-ui,sans-serif;overflow-x:hidden}
-canvas#net{position:fixed;inset:0;width:100%;height:100%;z-index:0;opacity:.55}
+body{margin:0;padding-top:env(safe-area-inset-top,0px);background:var(--bg);color:var(--text);font:16px/1.6 "Segoe UI",system-ui,sans-serif;overflow-x:hidden}
+canvas#net{position:fixed;inset:0;width:100%;height:100%;z-index:0;opacity:.55;pointer-events:none}
 .grid{position:fixed;inset:0;z-index:0;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:56px 56px;opacity:.18;pointer-events:none}
 #glow{position:fixed;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,var(--glow),transparent 65%);pointer-events:none;z-index:0;transform:translate(-50%,-50%);left:50%;top:30%;opacity:.35}
 main,header,footer{position:relative;z-index:1}
-header{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:rgba(4,7,15,.8);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+header{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 20px;background:rgba(4,7,15,.8);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 .logo{font:800 20px/1 "Trebuchet MS",sans-serif;letter-spacing:.22em;color:var(--text);text-decoration:none;text-shadow:0 0 14px var(--neon)}
 nav{display:flex;gap:18px;align-items:center}
 nav a{color:var(--mute);text-decoration:none;font-size:14px}
 nav a:hover,nav a:focus-visible{color:var(--neon)}
-.lang{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.lang{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;flex-shrink:0}
 .lang button{background:none;border:0;color:var(--mute);padding:6px 10px;font-size:13px;cursor:pointer}
 .lang button[aria-pressed=true]{background:var(--neon);color:#001226;font-weight:700}
-@media(max-width:720px){nav a{display:none}}
+@media(max-width:720px){nav{gap:8px}nav>a{display:none}header{padding:10px 12px}.logo{font-size:18px;letter-spacing:.14em}}
 section{padding:72px 20px;max-width:1040px;margin:0 auto}
 .hero{min-height:82vh;display:flex;flex-direction:column;justify-content:center}
 h1{font:800 clamp(48px,14vw,128px)/.95 "Trebuchet MS",sans-serif;letter-spacing:.06em;margin:0;color:#fff;text-shadow:0 0 22px var(--neon),0 0 60px var(--glow)}
@@ -51,8 +52,11 @@ label{font-size:14px;color:var(--mute)}
 input,textarea{width:100%;padding:12px;border-radius:8px;border:1px solid var(--line);background:#060d1c;color:var(--text);font:inherit;margin-top:4px}
 .note{font-size:13px;color:var(--mute);margin-top:10px}
 #msg{color:var(--neon);min-height:1.4em}
-footer{border-top:1px solid var(--line);padding:28px 20px;text-align:center;color:var(--mute);font-size:14px}
-.own-p{position:fixed;left:0;right:0;bottom:0;max-height:78vh;overflow:auto;z-index:9;background:#050b18;border-top:1px solid var(--neon);padding:18px 20px calc(70px + env(safe-area-inset-bottom,0px))}.own-p label{display:block;margin-bottom:10px}
+footer{border-top:1px solid var(--line);padding:28px 20px calc(28px + env(safe-area-inset-bottom,0px));text-align:center;color:var(--mute);font-size:14px}
+.own-p{position:fixed;left:0;right:0;bottom:0;max-height:78vh;overflow:auto;z-index:9;background:#050b18;border-top:1px solid var(--neon);padding:18px 20px calc(70px + env(safe-area-inset-bottom,0px))}
+.own-p label{display:block;margin-bottom:10px}
+.own-p h3{margin-top:0}
+.own-p .btn{margin-top:8px}
 .rv{opacity:0;transform:translateY(18px);transition:opacity .6s,transform .6s}
 .rv.in{opacity:1;transform:none}
 @media(prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}.pack{transition:none}html{scroll-behavior:auto}}
@@ -60,12 +64,20 @@ footer{border-top:1px solid var(--line);padding:28px 20px;text-align:center;colo
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 </head>
 <body>
-<canvas id="net" aria-hidden="true"></canvas><div class="grid"></div><div id="glow"></div>
+<canvas id="net" aria-hidden="true"></canvas>
+<div class="grid" aria-hidden="true"></div>
+<div id="glow" aria-hidden="true"></div>
 <header>
 <a class="logo" href="#top">PIXELON</a>
-<nav>
-<a href="#services" data-i="nav1"></a><a href="#how" data-i="nav2"></a><a href="#faq" data-i="nav3"></a><a href="#contact" data-i="nav4"></a>
-<div class="lang" role="group" aria-label="Language"><button data-l="sk" aria-pressed="true">SK</button><button data-l="en" aria-pressed="false">EN</button></div>
+<nav aria-label="Main navigation">
+<a href="#services" data-i="nav1"></a>
+<a href="#how" data-i="nav2"></a>
+<a href="#faq" data-i="nav3"></a>
+<a href="#contact" data-i="nav4"></a>
+<div class="lang" role="group" aria-label="Language">
+<button type="button" data-l="sk" aria-pressed="true">SK</button>
+<button type="button" data-l="en" aria-pressed="false">EN</button>
+</div>
 </nav>
 </header>
 <main id="top">
@@ -73,44 +85,42 @@ footer{border-top:1px solid var(--line);padding:28px 20px;text-align:center;colo
 <h1>PIXELON</h1>
 <div class="slogan">Edit. Create. Dominate.</div>
 <p class="lead" data-i="lead"></p>
-<div class="cta"><a class="btn main" href="#services" data-i="cta1"></a><a class="btn" href="#reel" data-i="cta2"></a></div>
+<div class="cta">
+<a class="btn main" href="#services" data-i="cta1"></a>
+<a class="btn" href="#reel" data-i="cta2"></a>
+</div>
 </section>
-
 <section id="reel" class="rv">
 <h2 data-i="reelT"></h2>
 <div class="panel reel"><div><strong data-i="reelA"></strong><br><span data-i="reelB"></span></div></div>
 </section>
-
 <section id="services" class="rv">
 <h2 data-i="srvT"></h2>
 <div class="packs">
-<div class="panel pack"><h3>Basic</h3><div class="price" data-price="basic">1 €</div><p data-i="p1"></p><a class="btn" href="#contact" data-i="order"></a></div>
+<div class="panel pack"><h3>Basic</h3><div class="price" data-price="basic">2 €</div><p data-i="p1"></p><a class="btn" href="#contact" data-i="order"></a></div>
 <div class="panel pack hot"><h3>Pro</h3><div class="price" data-price="pro">5 €</div><p data-i="p2"></p><a class="btn main" href="#contact" data-i="order"></a></div>
 <div class="panel pack"><h3>Premium</h3><div class="price" data-price="premium">15 €</div><p data-i="p3"></p><a class="btn" href="#contact" data-i="order"></a></div>
 <div class="panel pack"><h3 data-i="p4n"></h3><div class="price" data-i="p4p"></div><p data-i="p4"></p><a class="btn" href="#contact" data-i="quote"></a></div>
 </div>
 <p class="note" data-i="priceNote"></p>
 </section>
-
 <section id="work" class="rv">
 <h2 data-i="portT"></h2>
 <div class="panel reel" style="aspect-ratio:auto;padding:40px"><span data-i="portE"></span></div>
 </section>
-
 <section id="how" class="rv">
 <h2 data-i="howT"></h2>
 <ol class="steps">
-<li class="panel" data-i="s1"></li><li class="panel" data-i="s2"></li><li class="panel" data-i="s3"></li><li class="panel" data-i="s4"></li><li class="panel" data-i="s5"></li><li class="panel" data-i="s6"></li>
+<li class="panel" data-i="s1"></li><li class="panel" data-i="s2"></li><li class="panel" data-i="s3"></li>
+<li class="panel" data-i="s4"></li><li class="panel" data-i="s5"></li><li class="panel" data-i="s6"></li>
 </ol>
 </section>
-
 <section id="faq" class="rv">
 <h2>FAQ</h2>
 <details><summary data-i="q1"></summary><p data-i="a1"></p></details>
 <details><summary data-i="q2"></summary><p data-i="a2"></p></details>
 <details><summary data-i="q3"></summary><p data-i="a3"></p></details>
 </section>
-
 <section id="contact" class="rv">
 <h2 data-i="conT"></h2>
 <form id="f">
@@ -118,62 +128,191 @@ footer{border-top:1px solid var(--line);padding:28px 20px;text-align:center;colo
 <label><span data-i="fe"></span><input name="e" type="email" required autocomplete="email"></label>
 <label><span data-i="fm"></span><textarea name="m" rows="4" required></textarea></label>
 <button class="btn main" type="submit" data-i="send"></button>
-<div id="msg" role="status"></div>
+<div id="msg" role="status" aria-live="polite"></div>
 </form>
 <p class="note" data-i="demoNote"></p>
 </section>
 </main>
 <footer><div id="soc"></div><div id="mail" class="note"></div><span>© PIXELON</span> · <span data-i="draft"></span></footer>
-
-<script type="application/json" id="state">{"prices":{"basic":"2 €","pro":"5 €","premium":"15 €"},"leadSk":"Profesionálny strih videí a tvorba softvéru. Pošlete materiály, my z nich urobíme obsah, ktorý zaujme.","leadEn":"Professional video editing and software development. Send your material and we turn it into content that stands out.","email":"pixelon13245@gmail.com","soc":{"yt":"","dc":"","tt":"","ig":""}}</script>
-<script>
-var S={};try{S=JSON.parse(document.getElementById("state").textContent)||{}}catch(e){}
-var T={sk:{nav1:"Služby",nav2:"Postup",nav3:"FAQ",nav4:"Kontakt",lead:"Profesionálny strih videí a tvorba softvéru. Pošlete materiály, my z nich urobíme obsah, ktorý zaujme.",cta1:"Objednať službu",cta2:"Pozrieť portfólio",reelT:"Showreel",reelA:"Tu bude showreel.",reelB:"Zástupný prvok, kým nenahráš vlastné video.",srvT:"Balíky a ceny",p1:"Jednoduché strihy, základné prechody a hudba.",p2:"Dynamické strihy, efekty, titulky a zvuk.",p3:"Pokročilé efekty, detailný strih a individuálny prístup.",p4n:"Individuálna ponuka",p4p:"Podľa dohody",p4:"Cenová ponuka podľa vašich požiadaviek.",order:"Objednať",quote:"Žiadosť o ponuku",priceNote:"Ceny sú počiatočné. V ostrej verzii ich upraví administrátor.",portT:"Portfólio",portE:"Zatiaľ žiadne projekty. Prvé práce sa zobrazia po nahratí a schválení v administrácii.",howT:"Ako to funguje",s1:"Výber služby",s2:"Zadanie požiadaviek",s3:"Platba",s4:"Strih",s5:"Revízie",s6:"Dodanie",q1:"Koľko trvá dodanie?",a1:"Termín závisí od dĺžky videa a balíka. Presný dátum uvidíte pred potvrdením objednávky.",q2:"Koľko revízií je v cene?",a2:"Počet bezplatných revízií je pri každom balíku uvedený pred objednávkou.",q3:"Ako zaplatím?",a3:"Platby budú cez PayPal. Zatiaľ nie sú nakonfigurované.",conT:"Kontakt",fn:"Meno",fe:"Email",fm:"Správa",send:"Odoslať správu",demoNote:"Formulár otvorí tvoju emailovú aplikáciu s hotovou správou. Odošleš ju tam.",draft:"Ukážková verzia, právne dokumenty doplníme.",sent:"Otváram emailovú aplikáciu… správu tam ešte odošli."},
-en:{nav1:"Services",nav2:"Process",nav3:"FAQ",nav4:"Contact",lead:"Professional video editing and software development. Send your material and we turn it into content that stands out.",cta1:"Order a service",cta2:"View portfolio",reelT:"Showreel",reelA:"Your showreel goes here.",reelB:"Placeholder until you upload your own video.",srvT:"Packages and pricing",p1:"Simple cuts, basic transitions and music.",p2:"Dynamic cuts, effects, subtitles and sound.",p3:"Advanced effects, detailed editing and personal approach.",p4n:"Custom offer",p4p:"By agreement",p4:"A quote based on your requirements.",order:"Order",quote:"Request a quote",priceNote:"Prices are initial values. In the live version an admin can change them.",portT:"Portfolio",portE:"No projects yet. The first works will appear once uploaded and approved in the admin.",howT:"How it works",s1:"Choose a service",s2:"Describe your needs",s3:"Pay",s4:"Editing",s5:"Revisions",s6:"Delivery",q1:"How long does delivery take?",a1:"It depends on video length and package. You see the exact date before confirming the order.",q2:"How many revisions are included?",a2:"The number of free revisions is shown for each package before you order.",q3:"How do I pay?",a3:"Payments will go through PayPal. They are not configured yet.",conT:"Contact",fn:"Name",fe:"Email",fm:"Message",send:"Send message",demoNote:"The form opens your email app with the message ready. You send it from there.",draft:"Preview version, legal documents to be added.",sent:"Opening your email app… please send the message there."}};
-if(S.leadSk)T.sk.lead=S.leadSk;if(S.leadEn)T.en.lead=S.leadEn;
+<script type="application/json" id="state">{"prices":{"basic":"2 €","pro":"5 €","premium":"15 €"},"leadSk":"Profesionálny strih videí a tvorba softvéru. Pošlete materiály, my z nich urobíme obsah, ktorý zaujme.","leadEn":"Professional video editing and software development. Send your material and we turn it into content that stands out.","email":"pixelon13245@gmail.com","soc":{"yt":"","dc":"","tt":"","ig":""}}</script><script>
+"use strict";
+var S={};
+try{S=JSON.parse(document.getElementById("state").textContent)||{}}catch(e){}
+var T={
+sk:{nav1:"Služby",nav2:"Postup",nav3:"FAQ",nav4:"Kontakt",lead:"Profesionálny strih videí a tvorba softvéru. Pošlete materiály, my z nich urobíme obsah, ktorý zaujme.",cta1:"Objednať službu",cta2:"Pozrieť portfólio",reelT:"Showreel",reelA:"Tu bude showreel.",reelB:"Zástupný prvok, kým nenahráš vlastné video.",srvT:"Balíky a ceny",p1:"Jednoduché strihy, základné prechody a hudba.",p2:"Dynamické strihy, efekty, titulky a zvuk.",p3:"Pokročilé efekty, detailný strih a individuálny prístup.",p4n:"Individuálna ponuka",p4p:"Podľa dohody",p4:"Cenová ponuka podľa vašich požiadaviek.",order:"Objednať",quote:"Žiadosť o ponuku",priceNote:"Ceny sú počiatočné. V ostrej verzii ich upraví administrátor.",portT:"Portfólio",portE:"Zatiaľ žiadne projekty. Prvé práce sa zobrazia po nahratí a schválení v administrácii.",howT:"Ako to funguje",s1:"Výber služby",s2:"Zadanie požiadaviek",s3:"Platba",s4:"Strih",s5:"Revízie",s6:"Dodanie",q1:"Koľko trvá dodanie?",a1:"Termín závisí od dĺžky videa a balíka. Presný dátum uvidíte pred potvrdením objednávky.",q2:"Koľko revízií je v cene?",a2:"Počet bezplatných revízií je pri každom balíku uvedený pred objednávkou.",q3:"Ako zaplatím?",a3:"Platby budú cez PayPal. Zatiaľ nie sú nakonfigurované.",conT:"Kontakt",fn:"Meno",fe:"Email",fm:"Správa",send:"Odoslať správu",demoNote:"Formulár otvorí tvoju emailovú aplikáciu s hotovou správou. Odošleš ju tam.",draft:"Ukážková verzia, právne dokumenty doplníme.",sent:"Otváram emailovú aplikáciu… správu tam ešte odošli."},
+en:{nav1:"Services",nav2:"Process",nav3:"FAQ",nav4:"Contact",lead:"Professional video editing and software development. Send your material and we turn it into content that stands out.",cta1:"Order a service",cta2:"View portfolio",reelT:"Showreel",reelA:"Your showreel goes here.",reelB:"Placeholder until you upload your own video.",srvT:"Packages and pricing",p1:"Simple cuts, basic transitions and music.",p2:"Dynamic cuts, effects, subtitles and sound.",p3:"Advanced effects, detailed editing and personal approach.",p4n:"Custom offer",p4p:"By agreement",p4:"A quote based on your requirements.",order:"Order",quote:"Request a quote",priceNote:"Prices are initial values. In the live version an admin can change them.",portT:"Portfolio",portE:"No projects yet. The first works will appear once uploaded and approved in the admin.",howT:"How it works",s1:"Choose a service",s2:"Describe your needs",s3:"Pay",s4:"Editing",s5:"Revisions",s6:"Delivery",q1:"How long does delivery take?",a1:"It depends on video length and package. You see the exact date before confirming the order.",q2:"How many revisions are included?",a2:"The number of free revisions is shown for each package before you order.",q3:"How do I pay?",a3:"Payments will go through PayPal. They are not configured yet.",conT:"Contact",fn:"Name",fe:"Email",fm:"Message",send:"Send message",demoNote:"The form opens your email app with the message ready. You send it from there.",draft:"Preview version, legal documents to be added.",sent:"Opening your email app… please send the message there."}
+};
+if(S.leadSk)T.sk.lead=S.leadSk;
+if(S.leadEn)T.en.lead=S.leadEn;
 var lang=(navigator.language||"sk").slice(0,2)==="en"?"en":"sk";
-try{var s=localStorage.getItem("pxl");if(s)lang=s}catch(e){}
-function setL(l){lang=l;document.documentElement.lang=l;document.querySelectorAll("[data-i]").forEach(function(e){e.textContent=T[l][e.dataset.i]});document.querySelectorAll(".lang button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.l===l)});try{localStorage.setItem("pxl",l)}catch(e){}}
-document.querySelectorAll(".lang button").forEach(function(b){b.onclick=function(){setL(b.dataset.l)}});
+try{var saved=localStorage.getItem("pxl");if(saved==="sk"||saved==="en")lang=saved}catch(e){}
+function setL(l){
+lang=l;
+document.documentElement.lang=l;
+document.querySelectorAll("[data-i]").forEach(function(e){var key=e.dataset.i;if(T[l][key]!==undefined)e.textContent=T[l][key]});
+document.querySelectorAll(".lang button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.l===l)});
+try{localStorage.setItem("pxl",l)}catch(e){}
+}
+document.querySelectorAll(".lang button").forEach(function(b){b.addEventListener("click",function(){setL(b.dataset.l);if(typeof lab==="function")lab();if(typeof ap!=="undefined"&&!ap.hidden&&typeof panel==="function")panel(cm)})});
 setL(lang);
-function applyS(){var p=S.prices||{};document.querySelectorAll("[data-price]").forEach(function(e){if(p[e.dataset.price])e.textContent=p[e.dataset.price]});var so=document.getElementById("soc");so.textContent="";var nm={yt:"YouTube",dc:"Discord",tt:"TikTok",ig:"Instagram"};Object.keys(nm).forEach(function(k){var u=(S.soc||{})[k];if(u&&/^https:\/\//.test(u)){var a=document.createElement("a");a.href=u;a.target="_blank";a.rel="noopener";a.textContent=nm[k];a.style.margin="0 8px";a.style.color="var(--neon)";so.appendChild(a)}});document.getElementById("mail").textContent=S.email?"Email: "+S.email:""}
+function applyS(){
+var prices=S.prices||{};
+document.querySelectorAll("[data-price]").forEach(function(e){if(prices[e.dataset.price])e.textContent=prices[e.dataset.price]});
+var social=document.getElementById("soc");social.textContent="";
+var names={yt:"YouTube",dc:"Discord",tt:"TikTok",ig:"Instagram"};
+Object.keys(names).forEach(function(k){var url=(S.soc||{})[k];if(url&&/^https:\/\//i.test(url)){var a=document.createElement("a");a.href=url;a.target="_blank";a.rel="noopener noreferrer";a.textContent=names[k];a.style.margin="0 8px";a.style.color="var(--neon)";social.appendChild(a)}});
+document.getElementById("mail").textContent=S.email?"Email: "+S.email:"";
+}
 applyS();
-var SB_URL="https://lgokesgeslrtxmrwuofp.supabase.co",SB_KEY="sb_publishable_uiOwAcdqS0llVFGqS7ycqg_BhnTSuDH";
-var AU={sk:{in:"Prihlásiť",out:"Odhlásiť",reg:"Registrácia",log:"Prihlásenie",nw:"Nové heslo",em:"Email",pw:"Heslo (min. 8 znakov)",g1:"Prihlásiť sa",g2:"Vytvoriť účet",g3:"Uložiť heslo",fg:"Zabudnuté heslo",sw1:"Nemáš účet? Registrácia",sw2:"Máš účet? Prihlásenie",nc:"Prihlásenie zatiaľ nie je nakonfigurované.",ck:"Skontroluj email a potvrď registráciu.",rs:"Ak účet existuje, poslali sme odkaz na obnovu hesla.",bad:"Neplatné údaje alebo chyba. Skús znova.",short:"Heslo musí mať aspoň 8 znakov.",ok:"Heslo bolo zmenené.",x:"Zavrieť"},en:{in:"Log in",out:"Log out",reg:"Sign up",log:"Log in",nw:"New password",em:"Email",pw:"Password (min. 8 characters)",g1:"Log in",g2:"Create account",g3:"Save password",fg:"Forgot password",sw1:"No account? Sign up",sw2:"Have an account? Log in",nc:"Login is not configured yet.",ck:"Check your email and confirm your registration.",rs:"If the account exists, we sent a password reset link.",bad:"Invalid details or an error. Try again.",short:"Password must be at least 8 characters.",ok:"Password changed.",x:"Close"}};
+
+var SB_URL="https://lgokesgeslrtxmrwuofp.supabase.co";
+var SB_KEY="sb_publishable_uiOwAcdqS0llVFGqS7ycqg_BhnTSuDH";
+var AU={
+sk:{in:"Prihlásiť",out:"Odhlásiť",reg:"Registrácia",log:"Prihlásenie",nw:"Nové heslo",em:"Email",pw:"Heslo (min. 8 znakov)",g1:"Prihlásiť sa",g2:"Vytvoriť účet",g3:"Uložiť heslo",fg:"Zabudnuté heslo",sw1:"Nemáš účet? Registrácia",sw2:"Máš účet? Prihlásenie",nc:"Prihlásenie zatiaľ nie je nakonfigurované.",ck:"Registrácia prebehla. Skontroluj email a potvrď účet.",rs:"Ak účet existuje, poslali sme odkaz na obnovu hesla.",bad:"Neplatné údaje alebo chyba. Skús znova.",short:"Heslo musí mať aspoň 8 znakov.",ok:"Heslo bolo zmenené.",x:"Zavrieť",un:"Používateľské meno (3–20 znakov)",unbad:"Meno musí mať 3–20 znakov: písmená, čísla alebo podčiarkovník.",taken:"Toto používateľské meno je už obsadené. Vyber si iné.",working:"Spracúvam…",email:"Zadaj platný email."},
+en:{in:"Log in",out:"Log out",reg:"Sign up",log:"Log in",nw:"New password",em:"Email",pw:"Password (min. 8 characters)",g1:"Log in",g2:"Create account",g3:"Save password",fg:"Forgot password",sw1:"No account? Sign up",sw2:"Have an account? Log in",nc:"Login is not configured yet.",ck:"Registration submitted. Check your email to confirm your account.",rs:"If the account exists, we sent a password reset link.",bad:"Invalid details or an error. Try again.",short:"Password must be at least 8 characters.",ok:"Password changed.",x:"Close",un:"Username (3–20 characters)",unbad:"Username must be 3–20 characters: letters, numbers or underscore.",taken:"That username is already taken. Choose another.",working:"Processing…",email:"Enter a valid email."}
+};
 var sb=null,usr=null,cm="log";
-try{if(SB_URL&&SB_KEY&&window.supabase)sb=supabase.createClient(SB_URL,SB_KEY)}catch(e){}
-function A(k){return AU[lang][k]}
-var ab=document.createElement("button");ab.className="btn";ab.style.cssText="padding:6px 12px;min-height:36px;font-size:14px";
+try{if(SB_URL&&SB_KEY&&window.supabase&&window.supabase.createClient)sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(e){console.error("Supabase init failed",e)}
+function A(k){return (AU[lang]&&AU[lang][k])||AU.en[k]||k}
+var ab=document.createElement("button");
+ab.type="button";ab.className="btn";
+ab.style.cssText="padding:6px 12px;min-height:36px;font-size:14px";
 var nv=document.querySelector("nav");nv.insertBefore(ab,nv.querySelector(".lang"));
-var ap=document.createElement("div");ap.className="own-p";ap.hidden=true;document.body.appendChild(ap);
-function lab(){ab.textContent=usr?A("out"):A("in");ab.title=usr&&usr.email?usr.email:""}
+var ap=document.createElement("div");ap.className="own-p";ap.hidden=true;ap.setAttribute("aria-label","Account panel");document.body.appendChild(ap);
+function lab(){ab.textContent=usr?A("out"):A("in");ab.title=usr&&usr.email?usr.email:"";ab.setAttribute("aria-expanded",String(!ap.hidden))}
 function mk(t,c,f){var e=document.createElement(t);if(c)e.className=c;if(f)f(e);ap.appendChild(e);return e}
-function panel(m){cm=m;ap.textContent="";mk("h3","",function(e){e.textContent=m==="reg"?A("reg"):m==="new"?A("nw"):A("log")});
-if(!sb){mk("p","",function(e){e.textContent=A("nc")});mk("button","btn",function(e){e.textContent=A("x");e.onclick=function(){ap.hidden=true}});return}
-var em=null,pw,msg;
-if(m!=="new")mk("label","",function(l){l.textContent=A("em");em=document.createElement("input");em.type="email";em.autocomplete="email";l.appendChild(em)});
-mk("label","",function(l){l.textContent=A("pw");pw=document.createElement("input");pw.type="password";pw.autocomplete=m==="log"?"current-password":"new-password";l.appendChild(pw)});
-msg=mk("div","note");msg.setAttribute("role","status");
-mk("button","btn main",function(b){b.textContent=m==="reg"?A("g2"):m==="new"?A("g3"):A("g1");b.onclick=function(){var p=pw.value,e=em?em.value.trim():"";
-if(m!=="log"&&p.length<8){msg.textContent=A("short");return}
-var r=m==="reg"?sb.auth.signUp({email:e,password:p}):m==="new"?sb.auth.updateUser({password:p}):sb.auth.signInWithPassword({email:e,password:p});
-r.then(function(x){if(x.error){msg.textContent=A("bad");return}if(m==="reg"&&!(x.data&&x.data.session)){msg.textContent=A("ck")}else if(m==="new"){msg.textContent=A("ok")}else{ap.hidden=true}}).catch(function(){msg.textContent=A("bad")})}});
-if(m==="log"){mk("button","btn",function(b){b.style.marginLeft="8px";b.textContent=A("fg");b.onclick=function(){var e=em.value.trim();if(!e){msg.textContent=A("bad");return}sb.auth.resetPasswordForEmail(e,{redirectTo:location.origin+location.pathname}).then(function(){msg.textContent=A("rs")})}})}
-if(m!=="new")mk("p","",function(q){var a=document.createElement("a");a.href="#";a.style.color="var(--neon)";a.textContent=m==="reg"?A("sw2"):A("sw1");a.onclick=function(ev){ev.preventDefault();panel(m==="reg"?"log":"reg")};q.appendChild(a)});
-mk("button","btn",function(b){b.textContent=A("x");b.onclick=function(){ap.hidden=true}})}
-ab.onclick=function(){if(usr&&sb){sb.auth.signOut()}else{ap.hidden=false;panel("log")}};
-document.querySelectorAll(".lang button").forEach(function(b){b.addEventListener("click",function(){lab();if(!ap.hidden)panel(cm)})});
+function panel(m){
+cm=m;ap.textContent="";
+mk("h3","",function(e){e.textContent=m==="reg"?A("reg"):m==="new"?A("nw"):A("log")});
+if(!sb){
+mk("p","",function(e){e.textContent=A("nc")});
+mk("button","btn",function(b){b.type="button";b.textContent=A("x");b.onclick=function(){ap.hidden=true;lab()}});
+return;
+}
+var em=null,pw=null,un=null,msg;
+if(m==="reg")mk("label","",function(l){
+l.textContent=A("un");
+un=document.createElement("input");
+un.type="text";un.name="username";un.autocomplete="username";
+un.minLength=3;un.maxLength=20;un.pattern="[A-Za-z0-9_]{3,20}";
+un.required=true;un.placeholder="Pixelon123";
+l.appendChild(un);
+});
+if(m!=="new")mk("label","",function(l){
+l.textContent=A("em");
+em=document.createElement("input");em.type="email";em.autocomplete="email";em.required=true;l.appendChild(em);
+});
+mk("label","",function(l){
+l.textContent=A("pw");
+pw=document.createElement("input");pw.type="password";
+pw.autocomplete=m==="log"?"current-password":"new-password";
+pw.required=true;if(m!=="log")pw.minLength=8;l.appendChild(pw);
+});
+msg=mk("div","note");msg.setAttribute("role","status");msg.setAttribute("aria-live","polite");
+mk("button","btn main",function(b){
+b.type="button";b.textContent=m==="reg"?A("g2"):m==="new"?A("g3"):A("g1");
+b.onclick=async function(){
+var email=em?em.value.trim():"",password=pw.value,username=un?un.value.trim().toLowerCase():"";
+if(m==="reg"&&!/^[a-z0-9_]{3,20}$/.test(username)){msg.textContent=A("unbad");un.focus();return}
+if(m!=="new"&&(!em.checkValidity()||!email)){msg.textContent=A("email");em.focus();return}
+if(m!=="log"&&password.length<8){msg.textContent=A("short");pw.focus();return}
+b.disabled=true;msg.textContent=A("working");
+try{
+var result;
+if(m==="reg"){
+result=await sb.auth.signUp({email:email,password:password,options:{data:{username:username}}});
+}else if(m==="new"){
+result=await sb.auth.updateUser({password:password});
+}else{
+result=await sb.auth.signInWithPassword({email:email,password:password});
+}
+if(result.error){
+var err=String(result.error.message||"").toLowerCase();
+if(m==="reg"&&(err.includes("profiles_username_unique")||err.includes("duplicate key")||err.includes("unique constraint")||err.includes("already exists"))){msg.textContent=A("taken")}
+else{msg.textContent=A("bad")}
+b.disabled=false;return;
+}
+if(m==="reg"&&!(result.data&&result.data.session)){msg.textContent=A("ck");b.disabled=false;return}
+if(m==="new"){msg.textContent=A("ok");b.disabled=false;return}
+usr=result.data&&result.data.user?result.data.user:null;ap.hidden=true;lab();
+}catch(error){msg.textContent=A("bad");b.disabled=false}
+};
+});
+if(m==="log"){
+mk("button","btn",function(b){
+b.type="button";b.style.marginLeft="8px";b.textContent=A("fg");
+b.onclick=async function(){
+var email=em.value.trim();
+if(!em.checkValidity()||!email){msg.textContent=A("email");em.focus();return}
+b.disabled=true;
+try{var r=await sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});msg.textContent=r.error?A("bad"):A("rs")}
+catch(e){msg.textContent=A("bad")}
+b.disabled=false;
+};
+});
+}
+if(m!=="new")mk("p","",function(q){
+var a=document.createElement("a");a.href="#";a.style.color="var(--neon)";
+a.textContent=m==="reg"?A("sw2"):A("sw1");
+a.onclick=function(ev){ev.preventDefault();panel(m==="reg"?"log":"reg")};
+q.appendChild(a);
+});
+mk("button","btn",function(b){b.type="button";b.textContent=A("x");b.onclick=function(){ap.hidden=true;lab()}});
+}
+ab.onclick=async function(){
+if(usr&&sb){await sb.auth.signOut();ap.hidden=true;lab()}
+else{ap.hidden=false;panel("log");lab()}
+};
 lab();
-if(sb){sb.auth.getSession().then(function(r){usr=r.data&&r.data.session?r.data.session.user:null;lab()});sb.auth.onAuthStateChange(function(ev,s){usr=s?s.user:null;lab();if(ev==="PASSWORD_RECOVERY"){ap.hidden=false;panel("new")}})}
-document.getElementById("f").onsubmit=function(e){e.preventDefault();var f=e.target,to=S.email||"pixelon13245@gmail.com";var sub="PIXELON: "+f.n.value;var body=f.m.value+"\n\n"+f.n.value+" <"+f.e.value+">";document.getElementById("msg").textContent=T[lang].sent;location.href="mailto:"+to+"?subject="+encodeURIComponent(sub)+"&body="+encodeURIComponent(body)};
-var io=new IntersectionObserver(function(a){a.forEach(function(x){if(x.isIntersecting)x.target.classList.add("in")})},{threshold:.1});
+if(sb){
+sb.auth.getSession().then(function(r){usr=r.data&&r.data.session?r.data.session.user:null;lab()}).catch(function(){});
+sb.auth.onAuthStateChange(function(event,session){
+usr=session?session.user:null;lab();
+if(event==="PASSWORD_RECOVERY"){ap.hidden=false;panel("new")}
+});
+}
+document.getElementById("f").addEventListener("submit",function(e){
+e.preventDefault();
+var f=e.currentTarget,to=S.email||"pixelon13245@gmail.com";
+var subject="PIXELON: "+f.elements.n.value;
+var body=f.elements.m.value+"\n\n"+f.elements.n.value+" <"+f.elements.e.value+">";
+document.getElementById("msg").textContent=T[lang].sent;
+location.href="mailto:"+to+"?subject="+encodeURIComponent(subject)+"&body="+encodeURIComponent(body);
+});
+var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+if("IntersectionObserver" in window){
+var io=new IntersectionObserver(function(items){items.forEach(function(item){if(item.isIntersecting){item.target.classList.add("in");io.unobserve(item.target)}})},{threshold:.1});
 document.querySelectorAll(".rv").forEach(function(e){io.observe(e)});
-var reduce=matchMedia("(prefers-reduced-motion:reduce)").matches;
-var g=document.getElementById("glow");
-if(!reduce)addEventListener("pointermove",function(e){g.style.left=e.clientX+"px";g.style.top=e.clientY+"px"});
-var c=document.getElementById("net"),x=c.getContext("2d"),P=[],W,H;
-function rs(){W=c.width=innerWidth;H=c.height=innerHeight;P=[];var n=Math.min(60,Math.floor(W*H/22000));for(var i=0;i<n;i++)P.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35})}
-function dr(){x.clearRect(0,0,W,H);for(var i=0;i<P.length;i++){var p=P[i];if(!reduce){p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1}x.fillStyle="#1ea7ff";x.fillRect(p.x,p.y,2,2);for(var j=i+1;j<P.length;j++){var q=P[j],d=Math.hypot(p.x-q.x,p.y-q.y);if(d<140){x.strokeStyle="rgba(30,167,255,"+(1-d/140)*.35+")";x.beginPath();x.moveTo(p.x,p.y);x.lineTo(q.x,q.y);x.stroke()}}}if(!reduce)requestAnimationFrame(dr)}
-addEventListener("resize",function(){rs();if(reduce)dr()});rs();dr();
-</script></body></html>
+}else{document.querySelectorAll(".rv").forEach(function(e){e.classList.add("in")})}
+var glow=document.getElementById("glow");
+if(!reduce)window.addEventListener("pointermove",function(e){glow.style.left=e.clientX+"px";glow.style.top=e.clientY+"px"},{passive:true});
+var canvas=document.getElementById("net"),ctx=canvas.getContext?canvas.getContext("2d"):null,points=[],W=0,H=0;
+function resizeCanvas(){
+if(!ctx)return;
+var dpr=Math.min(window.devicePixelRatio||1,2);
+W=window.innerWidth;H=window.innerHeight;
+canvas.width=Math.floor(W*dpr);canvas.height=Math.floor(H*dpr);
+ctx.setTransform(dpr,0,0,dpr,0,0);points=[];
+var count=Math.min(60,Math.floor(W*H/22000));
+for(var i=0;i<count;i++)points.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35});
+}
+function drawNetwork(){
+if(!ctx)return;
+ctx.clearRect(0,0,W,H);
+for(var i=0;i<points.length;i++){
+var p=points[i];
+if(!reduce){p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1}
+ctx.fillStyle="#1ea7ff";ctx.fillRect(p.x,p.y,2,2);
+for(var j=i+1;j<points.length;j++){
+var q=points[j],d=Math.hypot(p.x-q.x,p.y-q.y);
+if(d<140){ctx.strokeStyle="rgba(30,167,255,"+(1-d/140)*.35+")";ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke()}
+}
+}
+if(!reduce)requestAnimationFrame(drawNetwork);
+}
+window.addEventListener("resize",function(){resizeCanvas();if(reduce)drawNetwork()});
+resizeCanvas();drawNetwork();
+</script>
 <script src="account.js"></script>
+</body>
+</html>
