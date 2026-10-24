@@ -1,59 +1,34 @@
+
 (function () {
-  if (!window.sb) return;
+  "use strict";
+
+  if (!window.sb) {
+    console.error("PIXELON: Supabase klient nie je dostupný.");
+    return;
+  }
 
   var sb = window.sb;
 
-  AU.sk.ck =
-    "Poslali sme ti overovací email. Klikni na odkaz v ňom a potom sa prihlás.";
-  AU.en.ck =
-    "We sent you a verification email. Click the link in it, then log in.";
-
-  ["signUp", "signInWithPassword"].forEach(function (n) {
-    var f = sb.auth[n].bind(sb.auth);
-
-    sb.auth[n] = function (a) {
-      return f(a).then(function (r) {
-        var m = r.error ? " (" + r.error.message + ")" : "";
-        AU.sk.bad = "Neplatné údaje alebo chyba." + m;
-        AU.en.bad = "Invalid details or an error." + m;
-        return r;
-      });
-    };
-  });
-
   var L = {
     sk: {
-      acc: "Môj účet",
-      ord: "Nová objednávka",
-      type: "Typ editu",
+      account: "Môj účet",
+      newOrder: "Nová objednávka",
+      editType: "Typ editu",
       package: "Balík",
-      dt: "Opíš svoje zadanie, štýl, dĺžku videa a termín...",
       title: "Názov projektu",
+      details: "Opíš zadanie, štýl, dĺžku videa a termín...",
       link: "Odkaz na video alebo materiály (nepovinné)",
-      go: "Odoslať objednávku",
-      my: "Moje objednávky",
-      none: "Zatiaľ žiadne objednávky.",
-      ok: "Objednávka bola odoslaná.",
-      err: "Nepodarilo sa odoslať objednávku.",
-      adm: "Administrácia: všetky objednávky",
-      sv: "Uložiť",
-      cl: "Zavrieť",
-      pr: "Postup %",
-      cu: "Individuálna ponuka",
-      note: "Cenu potvrdíme po prijatí objednávky. Platba zatiaľ nie je zapnutá.",
-      choose: "Vyber typ editu",
-      custom: "Doplňujúce informácie",
-      st: {
-        new: "Nová objednávka",
-        waiting_payment: "Čaká na platbu",
-        waiting_materials: "Čaká na materiály",
-        assigned: "Priradená editorovi",
-        in_progress: "Prebieha editovanie",
-        review: "Kontrola",
-        revisions: "Požadované úpravy",
-        done: "Dokončená",
-        cancelled: "Zrušená"
-      },
+      send: "Odoslať objednávku",
+      myOrders: "Moje objednávky",
+      allOrders: "Administrácia — všetky objednávky",
+      empty: "Zatiaľ žiadne objednávky.",
+      loading: "Načítavam...",
+      success: "Objednávka bola odoslaná.",
+      error: "Operácia sa nepodarila.",
+      save: "Uložiť",
+      close: "Zavrieť",
+      progress: "Postup v %",
+      paymentNote: "Cenu potvrdíme po prijatí objednávky. Platby zatiaľ nie sú zapnuté.",
       types: {
         minecraft: "Minecraft / gaming edit",
         youtube: "YouTube video",
@@ -66,46 +41,43 @@
         music: "Lyric / music video",
         other: "Iný typ editu"
       },
-      packs: {
+      packages: {
         basic: "Basic",
         pro: "Pro",
         premium: "Premium",
         custom: "Individuálna ponuka"
+      },
+      statuses: {
+        new: "Nová objednávka",
+        waiting_payment: "Čaká na platbu",
+        waiting_materials: "Čaká na materiály",
+        assigned: "Priradená editorovi",
+        in_progress: "Prebieha editovanie",
+        review: "Kontrola",
+        revisions: "Požadované úpravy",
+        done: "Dokončená",
+        cancelled: "Zrušená"
       }
     },
-
     en: {
-      acc: "My account",
-      ord: "New order",
-      type: "Edit type",
+      account: "My account",
+      newOrder: "New order",
+      editType: "Edit type",
       package: "Package",
-      dt: "Describe the project, style, video length and deadline...",
       title: "Project name",
+      details: "Describe the project, style, video length and deadline...",
       link: "Video or materials link (optional)",
-      go: "Submit order",
-      my: "My orders",
-      none: "No orders yet.",
-      ok: "Order submitted successfully.",
-      err: "Could not submit the order.",
-      adm: "Admin: all orders",
-      sv: "Save",
-      cl: "Close",
-      pr: "Progress %",
-      cu: "Custom offer",
-      note: "The price will be confirmed after receiving the order. Payments are not enabled yet.",
-      choose: "Choose edit type",
-      custom: "Additional information",
-      st: {
-        new: "New order",
-        waiting_payment: "Waiting for payment",
-        waiting_materials: "Waiting for materials",
-        assigned: "Assigned to editor",
-        in_progress: "Editing",
-        review: "Review",
-        revisions: "Revisions requested",
-        done: "Completed",
-        cancelled: "Cancelled"
-      },
+      send: "Submit order",
+      myOrders: "My orders",
+      allOrders: "Admin — all orders",
+      empty: "No orders yet.",
+      loading: "Loading...",
+      success: "Order submitted successfully.",
+      error: "The operation failed.",
+      save: "Save",
+      close: "Close",
+      progress: "Progress %",
+      paymentNote: "The price will be confirmed after receiving the order. Payments are not enabled yet.",
       types: {
         minecraft: "Minecraft / gaming edit",
         youtube: "YouTube video",
@@ -118,87 +90,85 @@
         music: "Lyric / music video",
         other: "Other edit"
       },
-      packs: {
+      packages: {
         basic: "Basic",
         pro: "Pro",
         premium: "Premium",
         custom: "Custom offer"
+      },
+      statuses: {
+        new: "New order",
+        waiting_payment: "Waiting for payment",
+        waiting_materials: "Waiting for materials",
+        assigned: "Assigned to editor",
+        in_progress: "Editing",
+        review: "Review",
+        revisions: "Revisions requested",
+        done: "Completed",
+        cancelled: "Cancelled"
       }
     }
   };
 
-  function T() {
-    return L[window.lang] ? L[window.lang] : L.sk;
+  function tr() {
+    var language = window.lang || "sk";
+    return L[language] || L.sk;
   }
 
-  var statuses = [
-    "new",
-    "waiting_payment",
-    "waiting_materials",
-    "assigned",
-    "in_progress",
-    "review",
-    "revisions",
-    "done",
-    "cancelled"
+  var typeKeys = [
+    "minecraft", "youtube", "shorts", "tiktok", "amv",
+    "cinematic", "intro", "promo", "music", "other"
   ];
 
-  var editTypes = [
-    "minecraft",
-    "youtube",
-    "shorts",
-    "tiktok",
-    "amv",
-    "cinematic",
-    "intro",
-    "promo",
-    "music",
-    "other"
+  var packageKeys = ["basic", "pro", "premium", "custom"];
+
+  var statusKeys = [
+    "new", "waiting_payment", "waiting_materials",
+    "assigned", "in_progress", "review",
+    "revisions", "done", "cancelled"
   ];
 
-  var packages = ["basic", "pro", "premium", "custom"];
-
-  function E(parent, tag, text, cls) {
+  function element(parent, tag, text, className) {
     var el = document.createElement(tag);
 
-    if (text !== undefined && text !== null && text !== "") {
+    if (text !== undefined && text !== null) {
       el.textContent = text;
     }
 
-    if (cls) el.className = cls;
+    if (className) el.className = className;
 
     parent.appendChild(el);
     return el;
   }
 
-  function styleField(el) {
+  function fieldStyle(el) {
     el.style.cssText =
       "display:block;width:100%;box-sizing:border-box;" +
-      "padding:13px;margin:8px 0;border-radius:10px;" +
+      "padding:12px;margin:8px 0;border-radius:9px;" +
       "border:1px solid var(--line,#20375c);" +
       "background:#060d1c;color:var(--text,#e6efff);" +
       "font:inherit;";
   }
 
-  function addOptions(select, keys, labels, selected) {
+  function fillSelect(select, keys, labels, selected) {
     keys.forEach(function (key) {
-      var option = E(select, "option", labels[key]);
+      var option = element(select, "option", labels[key]);
       option.value = key;
-
-      if (key === selected) option.selected = true;
+      option.selected = key === selected;
     });
   }
 
   // Modrá ikonka profilu
-  var cb = document.createElement("button");
-  cb.type = "button";
-  cb.className = "btn";
-  cb.textContent = "👤";
-  cb.title = "Môj účet";
-  cb.setAttribute("aria-label", "Môj účet");
-  cb.style.cssText =
+  var profileButton = document.createElement("button");
+  profileButton.type = "button";
+  profileButton.className = "btn";
+  profileButton.textContent = "👤";
+  profileButton.title = "Môj účet";
+  profileButton.setAttribute("aria-label", "Môj účet");
+  profileButton.style.cssText =
     "padding:6px 10px;min-height:36px;font-size:14px;" +
-    "display:none;border-color:#299df4;color:#299df4;";
+    "border:1px solid #299df4;color:#299df4;" +
+    "background:rgba(41,157,244,.08);display:none;";
 
   var nav = document.querySelector("nav");
 
@@ -206,373 +176,381 @@
     var referenceButton = nav.querySelector(".btn");
 
     if (referenceButton) {
-      nav.insertBefore(cb, referenceButton);
+      nav.insertBefore(profileButton, referenceButton);
     } else {
-      nav.appendChild(cb);
+      nav.appendChild(profileButton);
     }
   }
 
-  // Panel účtu
-  var panel = document.createElement("div");
+  // Panel profilu
+  var panel = document.createElement("section");
   panel.className = "own-p";
   panel.hidden = true;
-
   panel.style.cssText =
     "position:relative;z-index:20;max-width:900px;" +
-    "margin:20px auto;padding:20px;";
+    "margin:20px auto;padding:20px;" +
+    "color:var(--text,#e6efff);";
 
   document.body.appendChild(panel);
 
-  var uid = null;
+  var userId = null;
   var isAdmin = false;
-  var listContainer = null;
-  var currentUser = null;
+  var orderList = null;
+  var opening = false;
 
-  function render() {
-    var t = T();
-
-    panel.textContent = "";
-
-    E(panel, "h3", t.acc);
-
-    // Formulár objednávky
-    var form = E(panel, "div", "", "panel");
-    form.style.marginBottom = "16px";
-
-    E(form, "h4", t.ord);
-
-    E(form, "label", t.type);
-
-    var typeSelect = E(form, "select");
-    styleField(typeSelect);
-    addOptions(typeSelect, editTypes, t.types, "minecraft");
-
-    E(form, "label", t.package);
-
-    var packageSelect = E(form, "select");
-    styleField(packageSelect);
-    addOptions(packageSelect, packages, t.packs, "pro");
-
-    var projectTitle = E(form, "input");
-    projectTitle.type = "text";
-    projectTitle.placeholder = t.title;
-    projectTitle.maxLength = 120;
-    styleField(projectTitle);
-
-    var details = E(form, "textarea");
-    details.rows = 5;
-    details.placeholder = t.dt;
-    details.maxLength = 4000;
-    styleField(details);
-
-    var link = E(form, "input");
-    link.type = "url";
-    link.placeholder = t.link;
-    link.maxLength = 1000;
-    styleField(link);
-
-    var message = E(form, "p");
-    message.className = "note";
-    message.setAttribute("role", "status");
-
-    var submit = E(form, "button", t.go, "btn main");
-    submit.type = "button";
-    submit.style.marginTop = "8px";
-
-    E(form, "p", t.note, "note");
-
-    submit.onclick = function () {
-      var description = details.value.trim();
-      var title = projectTitle.value.trim();
-      var materialLink = link.value.trim();
-
-      if (!uid) {
-        message.textContent = t.err;
-        return;
-      }
-
-      if (!description) {
-        message.textContent = t.err;
-        details.focus();
-        return;
-      }
-
-      if (materialLink) {
-        try {
-          var parsed = new URL(materialLink);
-
-          if (
-            parsed.protocol !== "https:" &&
-            parsed.protocol !== "http:"
-          ) {
-            throw new Error("Invalid URL");
-          }
-        } catch (e) {
-          message.textContent = t.err;
-          link.focus();
-          return;
-        }
-      }
-
-      submit.disabled = true;
-      message.textContent = "";
-
-      var fullDetails =
-        (title ? "Projekt: " + title + "\n\n" : "") +
-        description +
-        (materialLink
-          ? "\n\nMateriály: " + materialLink
-          : "");
-
-      sb.from("orders")
-        .insert({
-          user_id: uid,
-          edit_type: typeSelect.value,
-          package: packageSelect.value,
-          details: fullDetails
-        })
-        .then(function (result) {
-          submit.disabled = false;
-
-          if (result.error) {
-            console.error("PIXELON order error:", result.error);
-            message.textContent = t.err;
-            return;
-          }
-
-          details.value = "";
-          projectTitle.value = "";
-          link.value = "";
-
-          message.textContent = t.ok;
-          loadOrders();
-        })
-        .catch(function (error) {
-          console.error(error);
-          submit.disabled = false;
-          message.textContent = t.err;
-        });
-    };
-
-    E(panel, "h4", isAdmin ? t.adm : t.my);
-
-    listContainer = E(panel, "div");
-
-    var close = E(panel, "button", t.cl, "btn");
-    close.type = "button";
-    close.style.marginTop = "12px";
-
-    close.onclick = function () {
-      panel.hidden = true;
-    };
-
-    loadOrders();
+  function showError(container, error) {
+    console.error("PIXELON:", error);
+    container.textContent = tr().error;
   }
 
-  function loadOrders() {
-    if (!listContainer || !uid) return;
+  async function loadOrders() {
+    if (!orderList || !userId) return;
 
-    var t = T();
-    listContainer.textContent = "Načítavam…";
+    var t = tr();
+    orderList.textContent = t.loading;
 
-    var query = sb
-      .from("orders")
-      .select("*")
-      .order("created_at", { ascending: false });
+    try {
+      var query = sb
+        .from("orders")
+        .select("*")
+        .order("created_at", { ascending: false });
 
-    // Bežný používateľ načíta iba svoje objednávky.
-    // Administrátor môže načítať všetky, ak to povoľujú RLS pravidlá.
-    if (!isAdmin) {
-      query = query.eq("user_id", uid);
-    }
+      if (!isAdmin) {
+        query = query.eq("user_id", userId);
+      }
 
-    query.then(function (result) {
-      listContainer.textContent = "";
+      var result = await query;
+
+      orderList.textContent = "";
 
       if (result.error) {
-        console.error("PIXELON orders error:", result.error);
-        E(listContainer, "p", t.err);
+        showError(orderList, result.error);
         return;
       }
 
       var orders = result.data || [];
 
       if (!orders.length) {
-        E(listContainer, "p", t.none);
+        element(orderList, "p", t.empty);
         return;
       }
 
       orders.forEach(function (order) {
-        var card = E(listContainer, "div", "", "panel");
+        var card = element(orderList, "article", "", "panel");
         card.style.marginBottom = "12px";
+        card.style.padding = "14px";
 
-        var typeName =
+        var editName =
           t.types[order.edit_type] ||
           order.edit_type ||
           "Edit";
 
         var packageName =
-          t.packs[order.package] ||
+          t.packages[order.package] ||
           order.package ||
           "";
 
-        E(
+        element(
           card,
           "strong",
-          packageName + " · " + typeName + " · " +
-            String(order.id || "").slice(0, 8)
+          packageName + " · " + editName +
+          " · " + String(order.id || "").slice(0, 8)
         );
 
-        var statusText =
-          t.st[order.status] || order.status || t.st.new;
+        var statusName =
+          t.statuses[order.status] ||
+          order.status ||
+          t.statuses.new;
 
         var progress = Number(order.progress || 0);
 
-        E(
+        element(
           card,
-          "div",
-          statusText + " · " + progress + " %",
+          "p",
+          statusName + " · " + progress + " %",
           "note"
         );
 
-        E(card, "p", order.details || "");
+        element(card, "p", order.details || "");
 
-        if (isAdmin) {
-          E(
-            card,
-            "div",
-            "user: " + String(order.user_id || "").slice(0, 8),
-            "note"
-          );
+        if (!isAdmin) return;
 
-          var statusSelect = E(card, "select");
-          styleField(statusSelect);
+        element(
+          card,
+          "p",
+          "ID používateľa: " +
+          String(order.user_id || "").slice(0, 8),
+          "note"
+        );
 
-          statuses.forEach(function (status) {
-            var option = E(
-              statusSelect,
-              "option",
-              t.st[status] || status
-            );
+        var statusSelect = element(card, "select");
+        fieldStyle(statusSelect);
 
-            option.value = status;
-            option.selected = status === order.status;
-          });
+        fillSelect(
+          statusSelect,
+          statusKeys,
+          t.statuses,
+          order.status || "new"
+        );
 
-          var progressInput = E(card, "input");
-          progressInput.type = "number";
-          progressInput.min = "0";
-          progressInput.max = "100";
-          progressInput.value = String(progress);
-          progressInput.setAttribute("aria-label", t.pr);
-          styleField(progressInput);
+        var progressInput = element(card, "input");
+        progressInput.type = "number";
+        progressInput.min = "0";
+        progressInput.max = "100";
+        progressInput.value = String(progress);
+        progressInput.setAttribute("aria-label", t.progress);
+        fieldStyle(progressInput);
 
-          var save = E(card, "button", t.sv, "btn");
-          save.type = "button";
+        var saveButton = element(card, "button", t.save, "btn");
+        saveButton.type = "button";
 
-          save.onclick = function () {
-            var value = parseInt(progressInput.value, 10);
+        saveButton.onclick = async function () {
+          var value = parseInt(progressInput.value, 10);
 
-            if (!Number.isFinite(value)) value = 0;
+          if (!Number.isFinite(value)) value = 0;
+          value = Math.max(0, Math.min(100, value));
 
-            value = Math.max(0, Math.min(100, value));
+          saveButton.disabled = true;
 
-            save.disabled = true;
-
-            sb.from("orders")
+          try {
+            var updateResult = await sb
+              .from("orders")
               .update({
                 status: statusSelect.value,
                 progress: value
               })
-              .eq("id", order.id)
-              .then(function (updateResult) {
-                save.disabled = false;
+              .eq("id", order.id);
 
-                if (updateResult.error) {
-                  console.error(updateResult.error);
-                  save.textContent = t.err;
-                  return;
-                }
+            if (updateResult.error) {
+              showError(card, updateResult.error);
+              return;
+            }
 
-                save.textContent = t.ok;
-                loadOrders();
-              })
-              .catch(function (error) {
-                console.error(error);
-                save.disabled = false;
-                save.textContent = t.err;
-              });
-          };
-        }
+            await loadOrders();
+          } catch (error) {
+            showError(card, error);
+          } finally {
+            saveButton.disabled = false;
+          }
+        };
       });
-    }).catch(function (error) {
-      console.error(error);
-      listContainer.textContent = t.err;
-    });
-  }
-
-  function handleSession(session) {
-    currentUser = session && session.user ? session.user : null;
-    uid = currentUser ? currentUser.id : null;
-
-    cb.style.display = uid ? "" : "none";
-
-    if (!uid) {
-      panel.hidden = true;
-      listContainer = null;
+    } catch (error) {
+      showError(orderList, error);
     }
   }
 
+  function render() {
+    var t = tr();
+    panel.textContent = "";
+
+    element(panel, "h3", t.account);
+
+    var form = element(panel, "div", "", "panel");
+    form.style.padding = "16px";
+
+    element(form, "h4", t.newOrder);
+
+    element(form, "label", t.editType);
+
+    var typeSelect = element(form, "select");
+    fieldStyle(typeSelect);
+    fillSelect(typeSelect, typeKeys, t.types, "minecraft");
+
+    element(form, "label", t.package);
+
+    var packageSelect = element(form, "select");
+    fieldStyle(packageSelect);
+    fillSelect(packageSelect, packageKeys, t.packages, "pro");
+
+    var projectName = element(form, "input");
+    projectName.type = "text";
+    projectName.maxLength = 120;
+    projectName.placeholder = t.title;
+    fieldStyle(projectName);
+
+    var description = element(form, "textarea");
+    description.rows = 5;
+    description.maxLength = 4000;
+    description.placeholder = t.details;
+    fieldStyle(description);
+
+    var materialsLink = element(form, "input");
+    materialsLink.type = "url";
+    materialsLink.maxLength = 1000;
+    materialsLink.placeholder = t.link;
+    fieldStyle(materialsLink);
+
+    var message = element(form, "p", "", "note");
+    message.setAttribute("role", "status");
+
+    var sendButton = element(form, "button", t.send, "btn main");
+    sendButton.type = "button";
+
+    element(form, "p", t.paymentNote, "note");
+
+    sendButton.onclick = async function () {
+      if (!userId) {
+        message.textContent = t.error;
+        return;
+      }
+
+      var text = description.value.trim();
+      var title = projectName.value.trim();
+      var url = materialsLink.value.trim();
+
+      if (!text) {
+        message.textContent = t.error;
+        description.focus();
+        return;
+      }
+
+      if (url) {
+        try {
+          var parsed = new URL(url);
+
+          if (parsed.protocol !== "https:" &&
+              parsed.protocol !== "http:") {
+            throw new Error("Invalid URL");
+          }
+        } catch (error) {
+          message.textContent = t.error;
+          materialsLink.focus();
+          return;
+        }
+      }
+
+      var fullDetails =
+        (title ? "Projekt: " + title + "\n\n" : "") +
+        text +
+        (url ? "\n\nMateriály: " + url : "");
+
+      sendButton.disabled = true;
+      message.textContent = t.loading;
+
+      try {
+        var result = await sb.from("orders").insert({
+          user_id: userId,
+          edit_type: typeSelect.value,
+          package: packageSelect.value,
+          details: fullDetails
+        });
+
+        if (result.error) {
+          showError(message, result.error);
+          return;
+        }
+
+        projectName.value = "";
+        description.value = "";
+        materialsLink.value = "";
+        message.textContent = t.success;
+
+        await loadOrders();
+      } catch (error) {
+        showError(message, error);
+      } finally {
+        sendButton.disabled = false;
+      }
+    };
+
+    element(panel, "h4", isAdmin ? t.allOrders : t.myOrders);
+
+    orderList = element(panel, "div");
+
+    var closeButton = element(panel, "button", t.close, "btn");
+    closeButton.type = "button";
+    closeButton.style.marginTop = "12px";
+    closeButton.onclick = function () {
+      panel.hidden = true;
+    };
+
+    loadOrders();
+  }
+
+  async function openProfile() {
+    if (opening) return;
+    opening = true;
+
+    try {
+      // Získame aktuálnu reláciu aj v prípade,
+      // že sa stav prihlásenia ešte nestihol načítať.
+      var sessionResult = await sb.auth.getSession();
+      var session =
+        sessionResult.data && sessionResult.data.session;
+
+      if (!session || !session.user) {
+        panel.hidden = true;
+        return;
+      }
+
+      userId = session.user.id;
+
+      // Panel sa otvorí ešte pred načítaním roly.
+      panel.hidden = false;
+      panel.textContent = tr().loading;
+
+      isAdmin = false;
+
+      try {
+        var roleResult = await sb
+          .from("profiles")
+          .select("role")
+          .eq("id", userId)
+          .maybeSingle();
+
+        if (!roleResult.error) {
+          isAdmin = !!(
+            roleResult.data &&
+            roleResult.data.role === "admin"
+          );
+        } else {
+          console.warn(
+            "PIXELON: Rolu sa nepodarilo načítať.",
+            roleResult.error
+          );
+        }
+      } catch (error) {
+        console.warn("PIXELON: Chyba pri načítaní roly.", error);
+      }
+
+      render();
+    } catch (error) {
+      console.error("PIXELON: Profil sa nepodarilo otvoriť.", error);
+      panel.hidden = false;
+      panel.textContent = tr().error;
+    } finally {
+      opening = false;
+    }
+  }
+
+  function updateSession(session) {
+    userId = session && session.user ? session.user.id : null;
+
+    profileButton.style.display = userId ? "" : "none";
+
+    if (!userId) {
+      panel.hidden = true;
+      panel.textContent = "";
+      orderList = null;
+      isAdmin = false;
+    }
+  }
+
+  profileButton.addEventListener("click", openProfile);
+
   sb.auth.getSession().then(function (result) {
-    handleSession(result.data && result.data.session);
+    updateSession(result.data && result.data.session);
+  }).catch(function (error) {
+    console.error("PIXELON: Nepodarilo sa načítať reláciu.", error);
   });
 
   sb.auth.onAuthStateChange(function (event, session) {
-    handleSession(session);
+    updateSession(session);
   });
-
-cb.onclick = async function () {
-  if (!uid) {
-    var result = await sb.auth.getSession();
-    var session = result.data && result.data.session;
-
-    if (!session || !session.user) {
-      panel.hidden = true;
-      return;
-    }
-
-    uid = session.user.id;
-  }
-
-  // Otvorenie profilu hneď po kliknutí
-  panel.hidden = false;
-  panel.textContent = "Načítavam profil…";
-
-  isAdmin = false;
-
-  try {
-    var result = await sb
-      .from("profiles")
-      .select("role")
-      .eq("id", uid)
-      .maybeSingle();
-
-    if (!result.error) {
-      isAdmin = !!(
-        result.data &&
-        result.data.role === "admin"
-      );
-    }
-  } catch (error) {
-    console.error("PIXELON profile error:", error);
-  }
-
-  render();
-};
 
   document.querySelectorAll(".lang button").forEach(function (button) {
     button.addEventListener("click", function () {
-      if (!panel.hidden && uid) render();
+      if (!panel.hidden && userId) render();
     });
   });
-})
+})();
