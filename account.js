@@ -1,4 +1,4 @@
-7 (function(){
+ (function(){
 if(!window.sb)return;
 AU.sk.ck="Poslali sme ti overovací email. Klikni na odkaz v ňom a potom sa prihlás.";AU.en.ck="We sent you a verification email. Click the link in it, then log in.";
 ["signUp","signInWithPassword"].forEach(function(n){var f=sb.auth[n].bind(sb.auth);sb.auth[n]=function(a){return f(a).then(function(r){var m=r.error?" ("+r.error.message+")":"";AU.sk.bad="Neplatné údaje alebo chyba."+m;AU.en.bad="Invalid details or an error."+m;return r})}});
