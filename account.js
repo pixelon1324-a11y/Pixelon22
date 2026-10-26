@@ -1,4 +1,4 @@
- (function(){
+7 (function(){
 if(!window.sb)return;
 AU.sk.ck="Poslali sme ti overovací email. Klikni na odkaz v ňom a potom sa prihlás.";AU.en.ck="We sent you a verification email. Click the link in it, then log in.";
 ["signUp","signInWithPassword"].forEach(function(n){var f=sb.auth[n].bind(sb.auth);sb.auth[n]=function(a){return f(a).then(function(r){var m=r.error?" ("+r.error.message+")":"";AU.sk.bad="Neplatné údaje alebo chyba."+m;AU.en.bad="Invalid details or an error."+m;return r})}});
@@ -43,4 +43,11 @@ sb.auth.getSession().then(function(r){sess(r.data&&r.data.session)});
 sb.auth.onAuthStateChange(function(e,s){sess(s)});
 cb.onclick=function(){bp.hidden=false;sb.from("profiles").select("role").eq("id",uid).maybeSingle().then(function(r){adm=!!(r.data&&r.data.role==="admin");render()})};
 document.querySelectorAll(".lang button").forEach(function(b){b.addEventListener("click",function(){if(!bp.hidden)render()})});
+})();
+(function(){
+var f=document.getElementById("f");if(!f)return;
+var X={sk:{ok:"Správa odoslaná, ďakujeme. Ozveme sa na tvoj email.",err:"Nepodarilo sa odoslať. Skús znova.",note:"Správa príde priamo nám, odpovieme na tvoj email."},en:{ok:"Message sent, thank you. We will reply to your email.",err:"Could not send. Please try again.",note:"Your message goes straight to us and we reply to your email."}};
+T.sk.demoNote=X.sk.note;T.en.demoNote=X.en.note;setL(lang);
+f.onsubmit=function(e){e.preventDefault();var m=document.getElementById("msg"),b=f.querySelector("button");b.disabled=true;m.textContent="…";
+fetch("https://formspree.io/f/mbgggqyz",{method:"POST",headers:{"Accept":"application/json","Content-Type":"application/json"},body:JSON.stringify({name:f.n.value,email:f.e.value,message:f.m.value})}).then(function(r){b.disabled=false;if(r.ok){f.reset();m.textContent=X[lang].ok}else{m.textContent=X[lang].err}}).catch(function(){b.disabled=false;m.textContent=X[lang].err})};
 })();
