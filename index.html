@@ -11,7 +11,47 @@ canvas#net{position:fixed;inset:0;width:100%;height:100%;z-index:0;opacity:.55}
 .grid{position:fixed;inset:0;z-index:0;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:56px 56px;opacity:.18;pointer-events:none}  
 #glow{position:fixed;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,var(--glow),transparent 65%);pointer-events:none;z-index:0;transform:translate(-50%,-50%);left:50%;top:30%;opacity:.35}  
 main,header,footer{position:relative;z-index:1}  
-header{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:rgba(4,7,15,.8);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}  
+header{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:rgba(4,7,15,.8);backdrop-filter:blur(10px);border-bottom:1px solid<!-- NOVÁ SEKCIA OBJEDNÁVANIA (PRILEPIŤ NA KONEC) -->
+<style>
+.pixelon-order { max-width: 600px; margin: 40px auto; background: var(--panel, #0a1224); border: 1px solid var(--line, #15305c); border-radius: 12px; padding: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+.pixelon-order h2 { color: var(--neon, #1ea7ff); text-align: center; margin-top: 0; }
+.pixelon-field { margin-bottom: 15px; }
+.pixelon-field label { display: block; color: var(--mute, #8aa0c4); font-size: 14px; margin-bottom: 6px; }
+.pixelon-field input, .pixelon-field select, .pixelon-field textarea { width: 100%; padding: 10px; background: var(--bg, #04070f); border: 1px solid var(--line, #15305c); border-radius: 6px; color: var(--text, #e6efff); font-family: inherit; }
+.pixelon-field input:focus, .pixelon-field select:focus, .pixelon-field textarea:focus { outline: none; border-color: var(--neon, #1ea7ff); }
+.pixelon-btn { width: 100%; background: var(--neon, #1ea7ff); color: #04070f; font-weight: bold; padding: 12px; border: none; border-radius: 6px; cursor: pointer; transition: 0.2s; font-size: 16px; }
+.pixelon-btn:hover { opacity: 0.9; }
+</style>
+
+<section id="order" class="pixelon-order">
+  <h2>Objednať web / službu</h2>
+  <form onsubmit="event.preventDefault(); alert('Dopyt bol odoslaný!');">
+    <div class="pixelon-field">
+      <label>Meno / Firma:</label>
+      <input type="text" placeholder="Tvoje meno" required>
+    </div>
+    <div class="pixelon-field">
+      <label>Email:</label>
+      <input type="email" placeholder="tvoj@email.com" required>
+    </div>
+    <div class="pixelon-field">
+      <label>Čo chceš vytvoriť?</label>
+      <select>
+        <option>Tvorba nového webu</option>
+        <option>Basic balíček (1 €)</option>
+        <option>Pro balíček (5 €)</option>
+        <option>Premium balíček (15 €)</option>
+        <option>Iné služby / Strih</option>
+      </select>
+    </div>
+    <div class="pixelon-field">
+      <label>Detaily objednávky:</label>
+      <textarea rows="4" placeholder="Popíš, ako by mal web vyzerať..."></textarea>
+    </div>
+    <button type="submit" class="pixelon-btn">Odoslať objednávku</button>
+  </form>
+</section>
+ var(--line)}  
 .logo{font:800 20px/1 "Trebuchet MS",sans-serif;letter-spacing:.22em;color:var(--text);text-decoration:none;text-shadow:0 0 14px var(--neon)}  
 nav{display:flex;gap:18px;align-items:center}  
 nav a{color:var(--mute);text-decoration:none;font-size:14px}  
