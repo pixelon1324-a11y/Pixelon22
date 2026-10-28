@@ -1,8 +1,9 @@
- (function(){
+(function(){
 if(!window.sb)return;
 AU.sk.ck="Poslali sme ti overovací email. Klikni na odkaz v ňom a potom sa prihlás.";AU.en.ck="We sent you a verification email. Click the link in it, then log in.";
 ["signUp","signInWithPassword"].forEach(function(n){var f=sb.auth[n].bind(sb.auth);sb.auth[n]=function(a){return f(a).then(function(r){var m=r.error?" ("+r.error.message+")":"";AU.sk.bad="Neplatné údaje alebo chyba."+m;AU.en.bad="Invalid details or an error."+m;return r})}});
-var L={sk:{acc:"Môj účet",ord:"Nová objednávka",dt:"Opis zadania (platforma, dĺžka, štýl, termín…)",go:"Odoslať objednávku",my:"Moje objednávky",none:"Zatiaľ žiadne objednávky.",ok:"Uložené.",err:"Nepodarilo sa uložiť.",adm:"Administrácia: všetky objednávky",sv:"Uložiť",cl:"Zavrieť",pr:"Postup %",cu:"Individuálna ponuka",note:"Platba zatiaľ nie je zapnutá. Cenu potvrdíme po prijatí objednávky.",st:{new:"Nová objednávka",waiting_payment:"Čaká na platbu",waiting_materials:"Čaká na materiály",assigned:"Priradená editorovi",in_progress:"Prebieha strih",review:"Kontrola",revisions:"Požadované revízie",done:"Dokončená",cancelled:"Zrušená"}},en:{acc:"My account",ord:"New order",dt:"Describe your request (platform, length, style, deadline…)",go:"Send order",my:"My orders",none:"No orders yet.",ok:"Saved.",err:"Could not save.",adm:"Admin: all orders",sv:"Save",cl:"Close",pr:"Progress %",cu:"Custom offer",note:"Payment is not enabled yet. We confirm the price after receiving your order.",st:{new:"New order",waiting_payment:"Waiting for payment",waiting_materials:"Waiting for materials",assigned:"Assigned to editor",in_progress:"Editing",review:"Review",revisions:"Revisions requested",done:"Completed",cancelled:"Cancelled"}}};
+var rp=sb.auth.resetPasswordForEmail.bind(sb.auth);sb.auth.resetPasswordForEmail=function(e,o){return rp(e,o).then(function(r){AU.sk.rs=r.error?"Nepodarilo sa odoslať ("+r.error.message+")":"Ak účet existuje, poslali sme odkaz na obnovu hesla.";AU.en.rs=r.error?"Could not send ("+r.error.message+")":"If the account exists, we sent a reset link.";return r})};
+var L={sk:{acc:"Môj účet",ord:"Nová objednávka",dt:"Opis zadania (platforma, dĺžka, štýl, termín…)",go:"Odoslať objednávku",my:"Moje objednávky",none:"Zatiaľ žiadne objednávky.",ok:"Uložené.",err:"Nepodarilo sa uložiť.",adm:"Administrácia: všetky objednávky",sv:"Uložiť",cl:"Zavrieť",pr:"Postup %",cu:"Individuálna ponuka",note:"Platba zatiaľ nie je zapnutá. Cenu potvrdíme po prijatí objednávky.",ch:"💬 Chat",snd:"Poslať",ph:"Napíš správu…",you:"Ty",cust:"Zákazník",st:{new:"Nová objednávka",waiting_payment:"Čaká na platbu",waiting_materials:"Čaká na materiály",assigned:"Priradená editorovi",in_progress:"Prebieha strih",review:"Kontrola",revisions:"Požadované revízie",done:"Dokončená",cancelled:"Zrušená"}},en:{acc:"My account",ord:"New order",dt:"Describe your request (platform, length, style, deadline…)",go:"Send order",my:"My orders",none:"No orders yet.",ok:"Saved.",err:"Could not save.",adm:"Admin: all orders",sv:"Save",cl:"Close",pr:"Progress %",cu:"Custom offer",note:"Payment is not enabled yet. We confirm the price after receiving your order.",ch:"💬 Chat",snd:"Send",ph:"Write a message…",you:"You",cust:"Customer",st:{new:"New order",waiting_payment:"Waiting for payment",waiting_materials:"Waiting for materials",assigned:"Assigned to editor",in_progress:"Editing",review:"Review",revisions:"Revisions requested",done:"Completed",cancelled:"Cancelled"}}};
 function T2(){return L[lang]}
 var ST=["new","waiting_payment","waiting_materials","assigned","in_progress","review","revisions","done","cancelled"];
 var PK=["basic","pro","premium","custom"];
@@ -12,6 +13,11 @@ var nv=document.querySelector("nav");nv.insertBefore(cb,nv.querySelector(".btn")
 var bp=document.createElement("div");bp.className="own-p";bp.hidden=true;document.body.appendChild(bp);
 var uid=null,adm=false,lst;
 function E(p,t,x,c){var e=document.createElement(t);if(x!=null&&x!=="")e.textContent=x;if(c)e.className=c;p.appendChild(e);return e}
+function badge(){if(!uid)return;sb.from("messages").select("order_id,sender_id,created_at").neq("sender_id",uid).then(function(m){sb.from("chat_reads").select("order_id,last_read").then(function(r){var lr={};(r.data||[]).forEach(function(x){lr[x.order_id]=x.last_read});var n=0;(m.data||[]).forEach(function(x){if(!lr[x.order_id]||Date.parse(x.created_at)>Date.parse(lr[x.order_id]))n++});cb.textContent="👤"+(n?" "+n:"")})})}
+function chat(c,o,t){var box=E(c,"div","","panel");box.style.marginTop="10px";var ml=E(box,"div");ml.style.cssText="max-height:220px;overflow:auto;margin-bottom:8px";var ta=E(box,"input");ta.maxLength=2000;ta.placeholder=t.ph;var sd=E(box,"button",t.snd,"btn main");sd.style.marginTop="8px";var tm=null;
+function ld(){sb.from("messages").select("*").eq("order_id",o.id).order("created_at").then(function(r){ml.textContent="";(r.data||[]).forEach(function(m){var d=E(ml,"div","","note");d.style.margin="6px 0";d.textContent=(m.sender_id===uid?t.you:(adm?t.cust:"PIXELON"))+": "+m.body+" · "+new Date(m.created_at).toLocaleString()});ml.scrollTop=ml.scrollHeight;sb.from("chat_reads").upsert({order_id:o.id,last_read:new Date().toISOString()},{onConflict:"order_id,user_id"}).then(badge)})}
+sd.onclick=function(){var v=ta.value.trim();if(!v)return;sd.disabled=true;sb.from("messages").insert({order_id:o.id,body:v}).then(function(r){sd.disabled=false;if(!r.error){ta.value="";ld()}})};
+ld();tm=setInterval(function(){if(!document.body.contains(box)){clearInterval(tm);return}ld()},10000)}
 function render(){var t=T2();bp.textContent="";E(bp,"h3",t.acc);
 var f=E(bp,"div","","panel");f.style.marginBottom="14px";
 E(f,"h4",t.ord).style.margin="0 0 8px";
@@ -37,10 +43,12 @@ var s=E(c,"select");ST.forEach(function(k){var op=E(s,"option",t.st[k]);op.value
 var p=E(c,"input");p.type="number";p.min=0;p.max=100;p.value=o.progress;p.setAttribute("aria-label",t.pr);
 var b=E(c,"button",t.sv,"btn");b.style.marginTop="8px";
 b.onclick=function(){sb.from("orders").update({status:s.value,progress:Math.max(0,Math.min(100,parseInt(p.value)||0))}).eq("id",o.id).then(function(x){b.textContent=x.error?t.err:t.ok;setTimeout(load,800)})}}
+var ob=E(c,"button",t.ch,"btn");ob.style.marginTop="8px";ob.style.marginLeft="8px";var op2=false;ob.onclick=function(){if(!op2){op2=true;chat(c,o,t)}}
 })})}
-function sess(s){uid=s&&s.user?s.user.id:null;cb.style.display=uid?"":"none";if(!uid)bp.hidden=true}
+function sess(s){uid=s&&s.user?s.user.id:null;cb.style.display=uid?"":"none";if(!uid)bp.hidden=true;else badge()}
 sb.auth.getSession().then(function(r){sess(r.data&&r.data.session)});
 sb.auth.onAuthStateChange(function(e,s){sess(s)});
+setInterval(badge,30000);
 cb.onclick=function(){bp.hidden=false;sb.from("profiles").select("role").eq("id",uid).maybeSingle().then(function(r){adm=!!(r.data&&r.data.role==="admin");render()})};
 document.querySelectorAll(".lang button").forEach(function(b){b.addEventListener("click",function(){if(!bp.hidden)render()})});
 })();
